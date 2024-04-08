@@ -33,7 +33,6 @@
         var path = d3.geoPath()
             .projection(projection);
 
-
         // Use Promise.all to parallelize asynchronous data loading
         var promises = [];
         promises.push(d3.csv("data/Foreign Aid Country Data_2020.csv")); // Load attributes from csv
@@ -44,16 +43,43 @@
             csvData = data[0];
             world = data[1];
 
+             //create the color scale
+            var colorScale = makeColorScale(csvData);
             // Translate world-countries TopoJSON
             var worldCountries = topojson.feature(world, world.objects.ne_110m_admin_0_countries_lakes).features;
-
             // Join csv data to GeoJSON enumeration units
             worldCountries = joinData(worldCountries, csvData);
-
             // Add enumeration units to the map
-            setEnumerationUnits(worldCountries, map, path);
+            setEnumerationUnits(worldCountries, map, path,colorScale);
         }
     } // End of setMap()
+
+    //function to create color scale generator
+    function makeColorScale(data){
+        var colorClasses = [
+            "#eff3ff",  
+            "#bdd7e7",
+            "#6baed6",
+            "#3182bd",
+            "#08519c"
+        ];
+
+        //create color scale generator
+        var colorScale = d3.scaleQuantile()
+            .range(colorClasses);
+
+        //build array of all values of the expressed attribute
+        var domainArray = [];
+        for (var i=0; i<data.length; i++){
+            var val = parseFloat(data[i][expressed]);
+            domainArray.push(val);
+        };
+
+        //assign array of expressed values as scale domain
+        colorScale.domain(domainArray);
+
+        return colorScale;
+    };
 
     function joinData(worldCountries, csvData){
         //loop through csv to assign each set of csv attribute values to geojson region
@@ -81,7 +107,8 @@
         return worldCountries;
     }
 
-    function setEnumerationUnits(worldCountries, map, path){
+
+    function setEnumerationUnits(worldCountries, map, path, colorScale){
         // Add world countries to map
         var countries = map.selectAll(".countries")
             .data(worldCountries)
@@ -90,7 +117,15 @@
             .attr("class", function(d){
                 return "countries " + d.properties.SOVEREIGNT;
             })
-            .attr("d", path);
+            .attr("d", path)
+            .style("fill", function(d){
+                var value = d.properties[expressed];            
+                if(value) {                
+                    return colorScale(d.properties[expressed]);            
+                } else {                
+                    return "#ccc";            
+                }    
+            });
             // console.log(worldCountries[11].properties);
     }
     
