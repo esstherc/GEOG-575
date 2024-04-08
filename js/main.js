@@ -1,65 +1,97 @@
-// begin script when window loads
-window.onload = setMap();
+// Self-executing anonymous function to move to local scope
+(function(){
 
-// set up choropleth map
-function setMap(){
+    // Pseudo-global variables
+    var attrArray = ["Debt", "Aid", "Aid / GDP", "Corruption", "GNI", "GDP Growth", "GDP Per Capita", "log(GDP)", "GDP", "Happiness Index"];
+    var expressed = attrArray[0]; // Initial attribute
 
-    // map frame dimensions
-    var width = 900,
-        height = 800;
+    // Begin script when window loads
+    window.onload = setMap();
 
-    // create new svg container for the map
-    var map = d3.select("body")
-        .append("svg")
-        .attr("class","map")
-        .attr("width",width)
-        .attr("height",height);
+    // Set up choropleth map
+    function setMap(){
+        // Map frame dimensions
+        var width = 900,
+            height = 800;
+
+        // Create new svg container for the map
+        var map = d3.select("body")
+            .append("svg")
+            .attr("class", "map")
+            .attr("width", width)
+            .attr("height", height);
+
+        // create projection
+        const parallel = 37.5;
+        const projection = d3.geoCylindricalEqualArea()
+            .parallel(parallel)
+            .translate([width / 2, height / 2])
+            .fitExtent([[0.5, 0.5], [width - 0.5, height - 0.5]], {type: "Sphere"})
+            .precision(0.1);
+        // *Write the projection block for your chosen projection in main.js.
+        
+        var path = d3.geoPath()
+            .projection(projection);
 
 
-    // create projection
-    const parallel = 37.5;
-    const projection = d3.geoCylindricalEqualArea()
-        .parallel(parallel)
-        .translate([width / 2, height / 2])
-        .fitExtent([[0.5, 0.5], [width - 0.5, height - 0.5]], {type: "Sphere"})
-        .precision(0.1);
-    // *Write the projection block for your chosen projection in main.js.
-    
-    var path = d3.geoPath()
-        .projection(projection);
+        // Use Promise.all to parallelize asynchronous data loading
+        var promises = [];
+        promises.push(d3.csv("data/Foreign Aid Country Data_2020.csv")); // Load attributes from csv
+        promises.push(d3.json("data/world-countries.topojson")); // Load background and spatial data
+        Promise.all(promises).then(callback);
 
-    // use Promise.all to parallelize asynchromous data loading
-    var promises =[];
+        function callback(data){
+            csvData = data[0];
+            world = data[1];
 
-    promises.push(d3.csv("data/Foreign Aid Country Data.csv")); // load attributes from csv
-    promises.push(d3.json("data/world-countries.topojson")); // load background and spatial data
-    Promise.all(promises).then(callback);
+            // Translate world-countries TopoJSON
+            var worldCountries = topojson.feature(world, world.objects.ne_110m_admin_0_countries_lakes).features;
 
-    // write callback function within setMap()
+            // Join csv data to GeoJSON enumeration units
+            worldCountries = joinData(worldCountries, csvData);
 
-    function callback(data){
-        csvData = data[0];
-        world = data[1];
-        console.log(world);
+            // Add enumeration units to the map
+            setEnumerationUnits(worldCountries, map, path);
+        }
+    } // End of setMap()
 
-        // translate world-countries topojson
-        var worldCountries = topojson.feature(world, world.objects.ne_110m_admin_0_countries_lakes);
-        console.log(worldCountries);
+    function joinData(worldCountries, csvData){
+        //loop through csv to assign each set of csv attribute values to geojson region
+        for (var i=0; i<csvData.length; i++){
+            var csvRegion = csvData[i]; //the current region
+            var csvKey = csvRegion.Country; //the CSV primary key
 
-        // add world countries to map
-        //add France regions to map
-        var worldCountries = map.selectAll(".countries")
-            .data(worldCountries.features)
+            //loop through geojson regions to find correct region
+            for (var a=0; a<worldCountries.length; a++){
+
+                var geojsonProps = worldCountries[a].properties; //the current region geojson properties
+                var geojsonKey = geojsonProps.SOVEREIGNT; //the geojson primary key
+
+                //where primary keys match, transfer csv data to geojson properties object
+                if (geojsonKey == csvKey){
+
+                    //assign all attributes and values
+                    attrArray.forEach(function(attr){
+                        var val = parseFloat(csvRegion[attr]); //get csv attribute value
+                        geojsonProps[attr] = val; //assign attribute and value to geojson properties
+                    });
+                };
+            };
+        };      
+        return worldCountries;
+    }
+
+    function setEnumerationUnits(worldCountries, map, path){
+        // Add world countries to map
+        var countries = map.selectAll(".countries")
+            .data(worldCountries)
             .enter()
             .append("path")
             .attr("class", function(d){
                 return "countries " + d.properties.SOVEREIGNT;
             })
             .attr("d", path);
-        console.log(worldCountries);
-    };
-};
-
-
-
-
+            // console.log(worldCountries[11].properties);
+    }
+    
+})(); // Last line of the self-executing anonymous function
