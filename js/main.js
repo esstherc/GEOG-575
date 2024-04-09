@@ -11,7 +11,7 @@
     // Set up choropleth map
     function setMap(){
         // Map frame dimensions
-        var width = window.innerWidth * 0.5, // 0.64
+        var width = window.innerWidth * 0.64, // 0.64
             height = 500;
 
         // Create new svg container for the map
@@ -138,7 +138,7 @@
     //function to create coordinated bar chart
     function setChart(csvData, colorScale){
         //chart frame dimensions
-        var chartWidth = window.innerWidth * 0.425,
+        var chartWidth = window.innerWidth * 0.3,
             chartHeight = 500
 
         //create a second svg element to hold the bar chart
@@ -198,22 +198,17 @@
                 var fraction = chartWidth / csvData.length;
                 return i * fraction + (fraction - 1) / 2;
             })
-            //.attr("y", function(d){
-            //    return chartHeight - yScale(parseFloat(d[expressed]))+10; 
-                // Adjust text location
-            //})
             .attr("y", function(d){
                 var barHeight = yScale(parseFloat(d[expressed]));
-                console.log(barHeight)
-                // If bar height is less than 20px, place text above the bar
-                return barHeight < 30 ? chartHeight - barHeight - 10 : chartHeight - barHeight + 10;
+                // If bar height is less than 30px, place text above the bar
+                return barHeight < 30 ? chartHeight - barHeight - 10 : chartHeight - barHeight + 13;
             })
             .text(function(d){
                 return Math.round(d[expressed] * 100) / 100;
             });
 
         var chartTitle = chart.append("text")
-            .attr("x", 250)
+            .attr("x", 100)
             .attr("y", 40)
             .attr("class", "chartTitle")
             .text(expressed + " in each region");
