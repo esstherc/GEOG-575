@@ -2,7 +2,7 @@
 (function(){
 
     // Pseudo-global variables
-    var attrArray = ["Debt", "Aid", "Aid / GDP", "Corruption", "GNI", "GDP Growth", "GDP Per Capita", "log(GDP)", "GDP", "Happiness Index"];
+    var attrArray = ["Debt", "Aid", "Aid / GDP", "Corruption", "GNI", "GDP Per Capita", "log(GDP)", "Happiness Index"];
     var expressed = attrArray[0]; // Initial attribute
 
     // Begin script when window loads
@@ -11,7 +11,7 @@
     // Set up choropleth map
     function setMap(){
         // Map frame dimensions
-        var width = window.innerWidth * 0.64, // 0.64
+        var width = window.innerWidth * 0.5, // 0.64
             height = 500;
 
         // Create new svg container for the map
@@ -35,7 +35,7 @@
 
         // Use Promise.all to parallelize asynchronous data loading
         var promises = [];
-        promises.push(d3.csv("data/Foreign Aid Country Data_2020_trim.csv")); // Load attributes from csv
+        promises.push(d3.csv("data/Foreign Aid Country Data_2020.csv")); // Load attributes from csv
         promises.push(d3.json("data/world-countries.topojson")); // Load background and spatial data
         Promise.all(promises).then(callback);
 
@@ -138,7 +138,7 @@
     //function to create coordinated bar chart
     function setChart(csvData, colorScale){
         //chart frame dimensions
-        var chartWidth = window.innerWidth * 0.3,
+        var chartWidth = window.innerWidth * 0.45,
             chartHeight = 500
 
         //create a second svg element to hold the bar chart
@@ -149,9 +149,9 @@
             .attr("class", "chart");
 
         //create a scale to size bars proportionally to frame
-        var yScale = d3.scaleLinear()
-            .range([0,chartHeight-5])
-            .domain([0, d3.max(csvData, function(d) { 
+        var yScale = d3.scaleLog()
+            .range([0, chartHeight - 5])
+            .domain([1, d3.max(csvData, function(d) { 
                 return parseFloat(d[expressed]); 
             })]);
 
