@@ -150,7 +150,7 @@
 
         //create a scale to size bars proportionally to frame
         var yScale = d3.scaleLinear()
-            .range([0,chartHeight])
+            .range([0,chartHeight-5])
             .domain([0, d3.max(csvData, function(d) { 
                 return parseFloat(d[expressed]); 
             })]);
@@ -198,8 +198,15 @@
                 var fraction = chartWidth / csvData.length;
                 return i * fraction + (fraction - 1) / 2;
             })
+            //.attr("y", function(d){
+            //    return chartHeight - yScale(parseFloat(d[expressed]))+10; 
+                // Adjust text location
+            //})
             .attr("y", function(d){
-                return chartHeight - yScale(parseFloat(d[expressed])) + 15;
+                var barHeight = yScale(parseFloat(d[expressed]));
+                console.log(barHeight)
+                // If bar height is less than 20px, place text above the bar
+                return barHeight < 30 ? chartHeight - barHeight - 10 : chartHeight - barHeight + 10;
             })
             .text(function(d){
                 return Math.round(d[expressed] * 100) / 100;
