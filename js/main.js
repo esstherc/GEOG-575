@@ -11,8 +11,8 @@
     // Set up choropleth map
     function setMap(){
         // Map frame dimensions
-        var width = 900,
-            height = 800;
+        var width = window.innerWidth * 0.5, // 0.64
+            height = 500;
 
         // Create new svg container for the map
         var map = d3.select("body")
@@ -35,7 +35,7 @@
 
         // Use Promise.all to parallelize asynchronous data loading
         var promises = [];
-        promises.push(d3.csv("data/Foreign Aid Country Data_2020.csv")); // Load attributes from csv
+        promises.push(d3.csv("data/Foreign Aid Country Data_2020_trim.csv")); // Load attributes from csv
         promises.push(d3.json("data/world-countries.topojson")); // Load background and spatial data
         Promise.all(promises).then(callback);
 
@@ -49,8 +49,14 @@
             var worldCountries = topojson.feature(world, world.objects.ne_110m_admin_0_countries_lakes).features;
             // Join csv data to GeoJSON enumeration units
             worldCountries = joinData(worldCountries, csvData);
+
+            var colorScale = makeColorScale(csvData);
             // Add enumeration units to the map
             setEnumerationUnits(worldCountries, map, path,colorScale);
+
+            //add coordinated visualization to the map
+            setChart(csvData, colorScale);
+
         }
     } // End of setMap()
 
@@ -128,5 +134,83 @@
             });
             // console.log(worldCountries[11].properties);
     }
+
+    //function to create coordinated bar chart
+    function setChart(csvData, colorScale){
+        //chart frame dimensions
+        var chartWidth = window.innerWidth * 0.425,
+            chartHeight = 500
+
+        //create a second svg element to hold the bar chart
+        var chart = d3.select("body")
+            .append("svg")
+            .attr("width", chartWidth)
+            .attr("height", chartHeight)
+            .attr("class", "chart");
+
+        //create a scale to size bars proportionally to frame
+        var yScale = d3.scaleLinear()
+            .range([0,chartHeight])
+            .domain([0, d3.max(csvData, function(d) { 
+                return parseFloat(d[expressed]); 
+            })]);
+
+        //set bars for each country
+        var bars = chart.selectAll(".bars")
+            .data(csvData)
+            .enter()
+            .append("rect")
+            .sort(function(a, b){
+                return b[expressed] - a[expressed]
+            })
+            .attr("class", function(d){
+                return "bars " + d.SOVEREIGNT;
+            })
+            .attr("width", chartWidth / csvData.length - 1)
+
+            .attr("x", function(d, i){
+                return i * (chartWidth / csvData.length);
+            })
+            .attr("height", function(d){
+                return yScale(parseFloat(d[expressed]));
+            })
+            .attr("y", function(d){
+                return chartHeight - yScale(parseFloat(d[expressed]));
+            })
+            .style("fill", function(d){
+                return colorScale(d[expressed]);
+            });
+
+
+        //annotate bars with attribute value text
+        var numbers = chart.selectAll(".numbers")
+            .data(csvData)
+            .enter()
+            .append("text")
+            .sort(function(a, b){
+                return b[expressed]-a[expressed];
+            })
+            .attr("class", function(d){
+                return "numbers " + d.SOVEREIGNT;
+            })
+            .attr("text-anchor", "middle")
+            .attr("x", function(d, i){
+                var fraction = chartWidth / csvData.length;
+                return i * fraction + (fraction - 1) / 2;
+            })
+            .attr("y", function(d){
+                return chartHeight - yScale(parseFloat(d[expressed])) + 15;
+            })
+            .text(function(d){
+                return Math.round(d[expressed] * 100) / 100;
+            });
+
+        var chartTitle = chart.append("text")
+            .attr("x", 250)
+            .attr("y", 40)
+            .attr("class", "chartTitle")
+            .text(expressed + " in each region");
+          
+    };
     
 })(); // Last line of the self-executing anonymous function
