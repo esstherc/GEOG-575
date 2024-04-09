@@ -1,4 +1,4 @@
-﻿Country,Debt,Aid ( in Billions),Aid / GDP,Corruption Perceptions Index,GNI ( in Thousands),GDP Per Capita ( in Thousands),log(GDP),Happiness Index
+﻿Country,Debt(in Thousands),Aid (in Billions),Aid / GDP,Corruption Perceptions Index,GNI (in Thousands),GDP Per Capita (in Thousands),log(GDP),Happiness Index
 India,564.18,44.81,1.68%,40,2635.41,1.93,12.43,3.57
 Colombia,155.17,38.63,14.29%,39,266.09,5.31,11.43,6.16
 Morocco,65.68,11.61,10.12%,40,113.03,3.06,11.06,5.09
