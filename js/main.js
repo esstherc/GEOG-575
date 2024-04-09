@@ -2,7 +2,7 @@
 (function(){
 
     // Pseudo-global variables
-    var attrArray = ["Debt", "Aid", "Aid / GDP", "Corruption", "GNI", "GDP Per Capita", "log(GDP)", "Happiness Index"];
+    var attrArray = ["Debt", "Aid (in Billions)", "Aid / GDP", "Corruption Perceptions Index", " GNI (in Thousands)", "GDP Per Capita (in Thousands)", "log(GDP)", "Happiness Index"];
     var expressed = attrArray[0]; // Initial attribute
 
     // Begin script when window loads
