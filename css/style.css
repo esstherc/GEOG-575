@@ -3,7 +3,7 @@ body {
 }
 
 .title {
-    font-family: sans-serif;
+    font-family: 'Gantari';
     font-size: 1.5em;
     font-weight: bold;
 }
@@ -28,12 +28,12 @@ body {
 
 .numbers {
     fill: black;
-    font-family: cambria;
+    font-family: 'Gantari';
     font-size: 10px;
 }
 
 .chartTitle {
-    font-family: sans-serif;
+    font-family: 'Gantari';
     font-size: 1em;
     font-weight: bold;
 }
@@ -58,7 +58,32 @@ body {
 }
 
 .axis text {
-    font-family: sans-serif;
+    font-family: 'Gantari';
     font-size: 0.8em;
     fill: #999;
+}
+
+.dropdown {
+    position: absolute;
+    top: 30px;
+    left: 40px;
+    z-index: 10;
+    font-family: 'Gantari';
+    font-size: 1em;
+    font-weight: bold;
+    background:#e3e2df;
+    padding: 2px;
+    border: 1px solid #999;
+    border-radius: 5px;
+    box-shadow: 2px 2px 4px #999;
+}
+
+.select-style select {
+    /* ... other styles ... */
+    color: #4a4346; /* Replace with your desired color code */
+    /* ... other styles ... */
+  }
+
+option {
+    font-weight: normal;
 }

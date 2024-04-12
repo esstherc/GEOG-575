@@ -2,7 +2,7 @@
 (function(){
 
     // Pseudo-global variables
-    var attrArray = ["Debt", "Aid (in Billions)", "Aid / GDP", "Corruption Perceptions Index", " GNI (in Thousands)", "GDP Per Capita (in Thousands)", "log(GDP)", "Happiness Index"];
+    var attrArray = ["Debt (in Thousands)", "Aid (in Billions)", "Aid / GDP", "Corruption Perceptions Index", " GNI (in Thousands)", "GDP Per Capita (in Thousands)", "log(GDP)", "Happiness Index"];
     var expressed = attrArray[0]; // Initial attribute
 
     // Begin script when window loads
@@ -56,6 +56,8 @@
 
             //add coordinated visualization to the map
             setChart(csvData, colorScale);
+
+            createDropdown();
 
         }
     } // End of setMap()
@@ -211,8 +213,29 @@
             .attr("x", 100)
             .attr("y", 40)
             .attr("class", "chartTitle")
-            .text(expressed + " in each region");
+            .text(expressed + " in each country");
           
     };
     
+    //function to create a dropdown menu for attribute selection
+    function createDropdown(){
+        //add select element
+        var dropdown = d3.select("body")
+            .append("select")
+            .attr("class", "dropdown");
+
+        //add initial option
+        var titleOption = dropdown.append("option")
+            .attr("class", "titleOption")
+            .attr("disabled", "true")
+            .text("Select Attribute");
+
+        //add attribute name options
+        var attrOptions = dropdown.selectAll("attrOptions")
+            .data(attrArray)
+            .enter()
+            .append("option")
+            .attr("value", function(d){ return d })
+            .text(function(d){ return d });
+    };
 })(); // Last line of the self-executing anonymous function
