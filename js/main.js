@@ -7,7 +7,7 @@
     var chart;
 
     // Map and chart frame dimensions
-    var width = window.innerWidth * 0.5, // 0.64
+    var width = window.innerWidth * 0.5,
         height = 500,
         chartWidth = window.innerWidth * 0.45,
         chartHeight = 500;
@@ -63,6 +63,11 @@
             createDropdown(csvData);
 
         }
+
+        var zoom = d3.zoom()
+            .scaleExtent([1, 6])
+            .on('zoom', handleZoom);
+        map.call(zoom);
     } // End of setMap()
 
     //function to create color scale generator
@@ -358,7 +363,7 @@
         label = label.split(' ').join('_')
         var selected = d3
             .selectAll("." + label)
-            .style("stroke", "red")
+            .style("stroke", "#63421d")
             .style("stroke-width", "2");
         setLabel(props);
     }
@@ -400,9 +405,9 @@
         console.log("here!");
         //label content
         if (props[expressed]) {
-            var labelAttribute = "<h1>" + props[expressed] + "</h1> <b>" + expressed + "</b>";
+            var labelAttribute = "<h5>" + props[expressed] + "</h5> <b>" + expressed + "</b>";
         } else {
-            var labelAttribute = "<h1>No Data</h1>"
+            var labelAttribute = "<h5>No Data</h5>"
         }
         
 
@@ -425,6 +430,11 @@
         d3.select(".infolabel")
             .style("left", x + "px")
             .style("top", y + "px");
+    }
+
+    function handleZoom(e) {
+        d3.selectAll('path')
+            .attr('transform', e.transform);
     }
 
 })(); // Last line of the self-executing anonymous function

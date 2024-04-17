@@ -97,13 +97,15 @@ option {
     background-color: #000;
     border: solid thin #fff;
     padding: 5px 10px;
+    font-family: 'Gantari';
 }
 
-.infolabel h1 {
+.infolabel h5 {
     margin: 0 20px 0 0;
     padding: 0;
     display: inline-block;
     line-height: 1em;
+    font-family: 'Gantari';
 }
 
 /*Example 2.11*/
@@ -118,4 +120,5 @@ option {
     border: solid thin #fff;
     padding: 5px 10px;
     top: -75px;
+    font-family: 'Gantari';
 }
