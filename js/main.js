@@ -2,18 +2,21 @@
 (function(){
 
     // Pseudo-global variables
-    var attrArray = ["Debt (in Thousands)", "Aid (in Billions)", "Aid / GDP", "Corruption Perceptions Index", " GNI (in Thousands)", "GDP Per Capita (in Thousands)", "log(GDP)", "Happiness Index"];
+    var attrArray = ["Debt (in Thousands)", "Aid (in Billions)", "Corruption Perceptions Index", "GDP Per Capita (in Thousands)", "log(GDP)", "Happiness Index"];
     var expressed = attrArray[0]; // Initial attribute
+    var chart;
+
+    // Map and chart frame dimensions
+    var width = window.innerWidth * 0.5, // 0.64
+        height = 500,
+        chartWidth = window.innerWidth * 0.45,
+        chartHeight = 500;
 
     // Begin script when window loads
     window.onload = setMap();
 
     // Set up choropleth map
     function setMap(){
-        // Map frame dimensions
-        var width = window.innerWidth * 0.5, // 0.64
-            height = 500;
-
         // Create new svg container for the map
         var map = d3.select("body")
             .append("svg")
@@ -57,7 +60,7 @@
             //add coordinated visualization to the map
             setChart(csvData, colorScale);
 
-            createDropdown();
+            createDropdown(csvData);
 
         }
     } // End of setMap()
@@ -111,7 +114,7 @@
                     });
                 };
             };
-        };      
+        };
         return worldCountries;
     }
 
@@ -123,7 +126,9 @@
             .enter()
             .append("path")
             .attr("class", function(d){
-                return "countries " + d.properties.SOVEREIGNT;
+                var name = d.properties.SOVEREIGNT;
+                name = name.split(' ').join('_');
+                return "countries " + name;
             })
             .attr("d", path)
             .style("fill", function(d){
@@ -133,16 +138,21 @@
                 } else {                
                     return "#ccc";            
                 }    
-            });
+            })
+            .on("mouseover", function (event, d) {
+                highlight(d.properties);
+            })
+            .on("mouseout", function (event, d) {
+                dehighlight(d.properties);
+            })
+            .on("mousemove", moveLabel);
+
+        var desc = countries.append("desc").text('{"stroke": "#000", "stroke-width": "0.5px"}');
             // console.log(worldCountries[11].properties);
     }
 
     //function to create coordinated bar chart
     function setChart(csvData, colorScale){
-        //chart frame dimensions
-        var chartWidth = window.innerWidth * 0.45,
-            chartHeight = 500
-
         //create a second svg element to hold the bar chart
         var chart = d3.select("body")
             .append("svg")
@@ -154,7 +164,7 @@
         var yScale = d3.scaleLog()
             .range([0, chartHeight - 5])
             .domain([1, d3.max(csvData, function(d) { 
-                return parseFloat(d[expressed]); 
+                return parseFloat(d[expressed])*1.5; 
             })]);
 
         //set bars for each country
@@ -166,10 +176,11 @@
                 return b[expressed] - a[expressed]
             })
             .attr("class", function(d){
-                return "bars " + d.SOVEREIGNT;
+                var name = d.Country;
+                name = name.split(' ').join('_')
+                return "bars " + name;
             })
             .attr("width", chartWidth / csvData.length - 1)
-
             .attr("x", function(d, i){
                 return i * (chartWidth / csvData.length);
             })
@@ -181,7 +192,14 @@
             })
             .style("fill", function(d){
                 return colorScale(d[expressed]);
-            });
+            })
+            .on("mouseover", function (event, d) {
+                highlight(d);
+            })
+            .on("mouseout", function (event, d) {
+                dehighlight(d);
+            })
+            .on("mousemove", moveLabel);
 
 
         //annotate bars with attribute value text
@@ -193,7 +211,7 @@
                 return b[expressed]-a[expressed];
             })
             .attr("class", function(d){
-                return "numbers " + d.SOVEREIGNT;
+                return "numbers";
             })
             .attr("text-anchor", "middle")
             .attr("x", function(d, i){
@@ -214,15 +232,21 @@
             .attr("y", 40)
             .attr("class", "chartTitle")
             .text(expressed + " in each country");
-          
-    };
+
+        //set bar positions, heights, and colors
+        //updateChart(bars, csvData.length, colorScale);
+        var desc = bars.append("desc").text('{"stroke": "none", "stroke-width": "0px"}');
+    };  //end of setChart()
     
     //function to create a dropdown menu for attribute selection
-    function createDropdown(){
+    function createDropdown(csvData){
         //add select element
         var dropdown = d3.select("body")
             .append("select")
-            .attr("class", "dropdown");
+            .attr("class", "dropdown")
+            .on("change", function(){
+                changeAttribute(this.value, csvData)
+            });
 
         //add initial option
         var titleOption = dropdown.append("option")
@@ -238,4 +262,169 @@
             .attr("value", function(d){ return d })
             .text(function(d){ return d });
     };
+
+    //dropdown change event handler
+    function changeAttribute(attribute, csvData) {
+        //change the expressed attribute
+        expressed = attribute;
+
+        //recreate the color scale
+        var colorScale = makeColorScale(csvData);
+
+        //create a scale to size bars proportionally to frame
+        var yScale = d3.scaleLog()
+            .range([0, chartHeight - 5])
+            .domain([1, d3.max(csvData, function(d) { 
+                return parseFloat(d[expressed])*1.5; 
+            })]);
+        //recolor enumeration units
+        var worldCountries = d3.selectAll(".countries")
+            .style("fill", function (d) {
+                var value = d.properties[expressed];
+                if (value) {
+                    return colorScale(d.properties[expressed]);
+                } else {
+                    return "#ccc";
+                }
+            })
+            .transition()
+            .duration(1000);
+
+        var bars = d3.selectAll(".bars")
+            .sort(function(a, b){
+                return b[expressed] - a[expressed]
+            })
+            .transition() //add animation
+            .delay(function (d, i) {
+                return i * 20;
+            })
+            .duration(500);
+        
+        var numbers = d3.selectAll(".numbers")
+            .sort(function(a, b){
+                return b[expressed]-a[expressed];
+            })
+            .attr("text-anchor", "middle")
+            .attr("x", function(d, i){
+                var fraction = chartWidth / csvData.length;
+                return i * fraction + (fraction - 1) / 2;
+            })
+            .attr("y", function(d){
+                var barHeight = yScale(parseFloat(d[expressed]));
+                // If bar height is less than 30px, place text above the bar
+                return barHeight < 30 ? chartHeight - barHeight - 10 : chartHeight - barHeight + 13;
+            })
+            .text(function(d){
+                return Math.round(d[expressed] * 100) / 100;
+            });
+        updateChart(bars, csvData.length, colorScale);
+    }; // end of changeAttribute()
+
+    function updateChart(bars, n, colorScale){
+        var yScale = d3.scaleLog()
+            .range([0, chartHeight - 5])
+            .domain([1, d3.max(csvData, function(d) { 
+                return parseFloat(d[expressed])*1.5; 
+            })]);
+        
+        //position bars
+        bars.attr("x",function(d, i){
+                return i * (chartWidth / n);
+            })
+            //size/ resize bars
+            .attr("height", function(d, i){
+                return yScale(parseFloat(d[expressed]));
+            })
+            .attr("y",function(d, i){
+                return chartHeight - yScale(parseFloat(d[expressed]));
+            })
+            // color/ recolor bars
+            .style("fill", function(d){
+                return colorScale(d[expressed]);
+            });
+        
+        //add text to chart title
+        var chartTitle = d3.select(".chartTitle")
+            .text(expressed + " in each country");
+    };
+    
+    function highlight(props) {
+        //change stroke
+        if(props.SOVEREIGNT){
+            var label = props.SOVEREIGNT;
+        } else {
+            var label = props.Country;
+        }
+        label = label.split(' ').join('_')
+        var selected = d3
+            .selectAll("." + label)
+            .style("stroke", "red")
+            .style("stroke-width", "2");
+        setLabel(props);
+    }
+
+    function dehighlight(props) {
+        if(props.SOVEREIGNT){
+            var label = props.SOVEREIGNT;
+        } else {
+            var label = props.Country;
+        }
+        label = label.split(' ').join('_')
+        var selected = d3
+            .selectAll("." + label)
+            .style("stroke", function () {
+                return getStyle(this, "stroke");
+            })
+            .style("stroke-width", function () {
+                return getStyle(this, "stroke-width");
+            });
+
+        function getStyle(element, styleName) {
+            var styleText = d3.select(element).select("desc").text();
+
+            var styleObject = JSON.parse(styleText);
+
+            return styleObject[styleName];
+        }
+        //remove info label
+        d3.select(".infolabel").remove();
+    }
+
+    function setLabel(props) {
+        if(props.SOVEREIGNT){
+            var label = props.SOVEREIGNT;
+        } else {
+            var label = props.Country;
+        }
+        label = label.split(' ').join('_')
+        console.log("here!");
+        //label content
+        if (props[expressed]) {
+            var labelAttribute = "<h1>" + props[expressed] + "</h1> <b>" + expressed + "</b>";
+        } else {
+            var labelAttribute = "<h1>No Data</h1>"
+        }
+        
+
+        //create info label div
+        var infolabel = d3
+            .select("body")
+            .append("div")
+            .attr("class", "infolabel")
+            .attr("id", label + "_label")
+            .html(labelAttribute);
+
+        var regionName = infolabel.append("div").attr("class", "labelname").html(label);
+    }
+
+    function moveLabel() {
+        //use coordinates of mousemove event to set label coordinates
+        var x = event.clientX + 10,
+            y = event.clientY - 75;
+
+        d3.select(".infolabel")
+            .style("left", x + "px")
+            .style("top", y + "px");
+    }
+
 })(); // Last line of the self-executing anonymous function
