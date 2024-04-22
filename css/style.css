@@ -108,7 +108,6 @@ option {
     font-family: 'Gantari';
 }
 
-/*Example 2.11*/
 
 .infolabel {
     margin: 0 20px 0 0;
@@ -121,4 +120,36 @@ option {
     padding: 5px 10px;
     top: -75px;
     font-family: 'Gantari';
+}
+#info {
+    display: flex;           
+    flex-direction: column;  
+    align-items: center;    
+    text-align: center;      
+    margin-top: 30px;       
+    margin-bottom: 20px; 
+}
+#title {
+    font-size: 24px;
+    font-weight: bold;
+    font-family: 'Gantari';
+    position:
+
+}
+
+#info span:not(#title) {    /* Targets all span elements inside #info except #title */
+    font-family: 'Gantari'; 
+    font-weight: bold;
+    font-size: 16px;               
+    color: #333;                  
+}
+
+/* Style for the data source link */
+#info a {
+    color: #0e3f74; 
+    text-decoration: none;  
+}
+
+#info a:hover {
+    text-decoration: underline;  /* Adds underline on hover */
 }
