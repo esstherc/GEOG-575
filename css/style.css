@@ -20,7 +20,7 @@ body {
 }
 
 .chart {
-    background-color: rgba(128,128,128,.2);
+    background-color: rgba(92, 74, 74, 0.2);
     border: medium solid #5C4B51;
     float: right;
     margin: 10px 20px 0 0;
@@ -39,7 +39,7 @@ body {
 }
 
 .chartBackground {
-    fill: rgba(128,128,128,.2);
+    fill: rgba(63, 36, 36, 0.887);
 }
 
 .chartFrame {
@@ -91,20 +91,20 @@ option {
 
 .infolabel {
     position: absolute;
-    height: 50px;
+    height: 5px;
     min-width: 100px;
     color: #fff;
-    background-color: #000;
+    background-color: rgba(84, 19, 19, 0.269);
     border: solid thin #fff;
     padding: 5px 10px;
     font-family: 'Gantari';
 }
 
-.infolabel h5 {
-    margin: 0 20px 0 0;
+.infolabel h2 {
+    margin: 0 10px 0 0;
     padding: 0;
     display: inline-block;
-    line-height: 1em;
+    line-height: 2em;
     font-family: 'Gantari';
 }
 
@@ -116,7 +116,7 @@ option {
     height: 100px;
     min-width: 100px;
     color: #fff;
-    background-color: #000;
+    background-color: rgb(91, 56, 56);
     border: solid thin #fff;
     padding: 5px 10px;
     top: -75px;

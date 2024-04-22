@@ -2,7 +2,7 @@
 (function(){
 
     // Pseudo-global variables
-    var attrArray = ["Debt (in Thousands)", "Aid (in Billions)", "Corruption Perceptions Index", "GDP Per Capita (in Thousands)", "log(GDP)", "Happiness Index"];
+    var attrArray = ["Debt (in Thousands)", "Aid (in Billions)", "Corruption Perceptions Index", "log(GDP)", "Happiness Index"];
     var expressed = attrArray[0]; // Initial attribute
     var chart;
 
@@ -77,7 +77,7 @@
             "#bdd7e7",
             "#6baed6",
             "#3182bd",
-            "#08519c"
+            "#007498"
         ];
 
         //create color scale generator
@@ -221,12 +221,23 @@
             .attr("text-anchor", "middle")
             .attr("x", function(d, i){
                 var fraction = chartWidth / csvData.length;
-                return i * fraction + (fraction - 1) / 2;
+                // return i * fraction + (fraction - 1) / 2;
+                if (expressed === attrArray[0]  && i === 0) {
+                    return i * fraction + (fraction / 2) + 5; // Shift the text right for the first bar of the first attribute only
+                } else {
+                    return i * fraction + (fraction - 1) / 2; 
+                }
             })
             .attr("y", function(d){
                 var barHeight = yScale(parseFloat(d[expressed]));
                 // If bar height is less than 30px, place text above the bar
-                return barHeight < 30 ? chartHeight - barHeight - 10 : chartHeight - barHeight + 13;
+                if (barHeight < 30) {
+                    return chartHeight - barHeight - 20; // Move the text above the bar for the first one
+                } else if (barHeight > 470) {
+                    return chartHeight - barHeight - 5; // Adjust the text down if the bar is very tall
+                } else {
+                    return chartHeight - barHeight + 13; // Default position for the first bar
+                }
             })
             .text(function(d){
                 return Math.round(d[expressed] * 100) / 100;
@@ -312,12 +323,23 @@
             .attr("text-anchor", "middle")
             .attr("x", function(d, i){
                 var fraction = chartWidth / csvData.length;
-                return i * fraction + (fraction - 1) / 2;
+                // return i * fraction + (fraction - 1) / 2;
+                if (expressed === attrArray[0]  && i === 0) {
+                    return i * fraction + (fraction / 2) + 5; // Shift the text right for the first bar of the first attribute only
+                } else {
+                    return i * fraction + (fraction - 1) / 2; 
+                }
             })
             .attr("y", function(d){
                 var barHeight = yScale(parseFloat(d[expressed]));
                 // If bar height is less than 30px, place text above the bar
-                return barHeight < 30 ? chartHeight - barHeight - 10 : chartHeight - barHeight + 13;
+                if (barHeight < 30) {
+                    return chartHeight - barHeight - 20; // Move the text above the bar for the first one
+                } else if (barHeight > 470) {
+                    return chartHeight - barHeight - 5; // Adjust the text down if the bar is very tall
+                } else {
+                    return chartHeight - barHeight + 13; // Default position for the first bar
+                }
             })
             .text(function(d){
                 return Math.round(d[expressed] * 100) / 100;
@@ -405,9 +427,9 @@
         console.log("here!");
         //label content
         if (props[expressed]) {
-            var labelAttribute = "<h5>" + props[expressed] + "</h5> <b>" + expressed + "</b>";
+            var labelAttribute = "<h2>" + props[expressed] + "</h2> <b>" + expressed + "</b>";
         } else {
-            var labelAttribute = "<h5>No Data</h5>"
+            var labelAttribute = "<h2>No Data</h2>"
         }
         
 
