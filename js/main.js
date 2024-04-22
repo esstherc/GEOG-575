@@ -13,8 +13,9 @@
         chartHeight = 500;
 
     // Begin script when window loads
-    window.onload = setMap();
-
+    window.onload = function() {
+        setMap();
+    };
     // Set up choropleth map
     function setMap(){
         // Create new svg container for the map
@@ -23,6 +24,12 @@
             .attr("class", "map")
             .attr("width", width)
             .attr("height", height);
+
+        var Title = map.append("text")
+                .attr("x", 150)
+                .attr("y", 60)
+                .attr("class", "Title")
+                .text("Top 20 Countries with Highest Debt and Key Indices");
 
         // create projection
         const parallel = 37.5;
