@@ -2,12 +2,6 @@ body {
     background-color: #e2d3be; 
 }
 
-.Title {
-    font-family: 'Gantari';
-    font-size: 1.2em;
-    font-weight: bold;
-}
-
 .countries {
     fill: rgba(99, 66, 29, 0.545);
     stroke: rgb(249, 249, 249);
@@ -34,7 +28,7 @@ body {
 
 .chartTitle {
     font-family: 'Gantari';
-    font-size: 1em;
+    font-size: 1.2em;
     font-weight: bold;
 }
 
@@ -49,23 +43,9 @@ body {
     shape-rendering: crispEdges;
 }
 
-.axis path,
-.axis line {
-    fill: none;
-    stroke: #999;
-    stroke-width: 1px;
-    shape-rendering: crispEdges;
-}
-
-.axis text {
-    font-family: 'Gantari';
-    font-size: 0.8em;
-    fill: #999;
-}
-
 .dropdown {
     position: absolute;
-    top: 30px;
+    top: 140px;
     left: 40px;
     z-index: 10;
     font-family: 'Gantari';
@@ -78,36 +58,9 @@ body {
     box-shadow: 2px 2px 4px #999;
 }
 
-.select-style select {
-    /* ... other styles ... */
-    color: #4a4346; /* Replace with your desired color code */
-    /* ... other styles ... */
-  }
-
 option {
     font-weight: normal;
 }
-
-
-.infolabel {
-    position: absolute;
-    height: 5px;
-    min-width: 100px;
-    color: #fff;
-    background-color: rgba(84, 19, 19, 0.269);
-    border: solid thin #fff;
-    padding: 5px 10px;
-    font-family: 'Gantari';
-}
-
-.infolabel h2 {
-    margin: 0 10px 0 0;
-    padding: 0;
-    display: inline-block;
-    line-height: 2em;
-    font-family: 'Gantari';
-}
-
 
 .infolabel {
     margin: 0 20px 0 0;
@@ -121,26 +74,35 @@ option {
     top: -75px;
     font-family: 'Gantari';
 }
+
+.infolabel h2 {
+    margin: 0 10px 0 0;
+    padding: 0;
+    display: inline-block;
+    line-height: 2em;
+    font-family: 'Gantari';
+}
+
+/* Titel and metadata */
 #info {
     display: flex;           
     flex-direction: column;  
     align-items: center;    
     text-align: center;      
     margin-top: 30px;       
-    margin-bottom: 20px; 
+    margin-bottom: 30px; 
 }
 #title {
     font-size: 24px;
     font-weight: bold;
     font-family: 'Gantari';
-    position:
 
 }
 
 #info span:not(#title) {    /* Targets all span elements inside #info except #title */
     font-family: 'Gantari'; 
     font-weight: bold;
-    font-size: 16px;               
+    font-size: 18px;               
     color: #333;                  
 }
 
@@ -152,4 +114,16 @@ option {
 
 #info a:hover {
     text-decoration: underline;  /* Adds underline on hover */
+}
+
+#supplemental-text {
+    display: flex;           
+    flex-direction: column;  
+    align-items: center;    
+    text-align: center;   
+    margin-left: auto;   
+    margin-right:auto;
+    margin-top: 30px;       
+    margin-bottom: 30px; 
+    max-width: 300px;
 }

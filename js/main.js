@@ -25,12 +25,6 @@
             .attr("width", width)
             .attr("height", height);
 
-        var Title = map.append("text")
-                .attr("x", 150)
-                .attr("y", 60)
-                .attr("class", "Title")
-                .text("Top 20 Countries with Highest Debt and Key Indices");
-
         // create projection
         const parallel = 37.5;
         const projection = d3.geoCylindricalEqualArea()
